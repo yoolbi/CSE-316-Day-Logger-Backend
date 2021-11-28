@@ -1,3 +1,4 @@
+// X
 var mongoose = require('mongoose');
 
 var Schema = mongoose.Schema;
@@ -5,7 +6,8 @@ var Schema = mongoose.Schema;
 var ResponseSchema = new Schema(
     {
         responseText: {type: String, Number},
-        responseQuestion: {type: Schema.Types.ObjectId, ref: 'Question', required: true}
+        // responseQuestion: {type: Schema.Types.ObjectId, ref: 'Question', required: true},
+        date: {type: String},
     }
 );
 
