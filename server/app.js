@@ -207,7 +207,7 @@ app.put('/api/questions/:id', requireLogin, wrapAsync(async function (req, res) 
     console.log("PUT with id: " + id + ", body: " + JSON.stringify(req.body));
     await Question.findByIdAndUpdate(id,
         {'questionText': req.body.questionText, 'responseType': req.body.responseType,
-            'multipleChoice': req.body.multipleChoice, 'response': req.body.response},
+            'multiText': req.body.multiText, 'response': req.body.response},
         {runValidators: true});
     res.sendStatus(204);
 }));
@@ -218,7 +218,9 @@ app.post('/api/questions', requireLogin, wrapAsync(async function (req, res) {
     const newQuestion = new Question({
         questionText: req.body.questionText,
         responseType: req.body.responseType,
-        questionOwner: req.session.userId
+        questionOwner: req.session.userId,
+        multiText: req.session.multiText,
+        response: req.session.response
     })
     // Calling save is needed to save it to the database given we aren't using a special method like the update above
     await newQuestion.save();
