@@ -103,28 +103,40 @@ app.use('/api/users/:id', (req, res, next) => {
     next(); // Try commenting out this next() and accessing a specific author page
 })
 
-app.get('/api/users', wrapAsync(async function (req,res) {
-    let users;
-    if (req.query.questions && req.query.questions === 'yes') {
-        let aggregatePipeline = [
-            {
-                '$lookup': {
-                    'from': 'questions',
-                    'localField': '_id',
-                    'foreignField': 'user',
-                    'as': 'questions'
-                }
-            }, {
-                '$sort': {
-                    'name': 1
-                }
-            }
-        ]
-        users = await User.aggregate(aggregatePipeline);
-    } else {
-        users = await User.findById(req.session.userId);
-    }
-    res.json(users);
+// app.get('/api/users', wrapAsync(async function (req,res) {
+//     let users;
+//     if (req.query.questions && req.query.questions === 'yes') {
+//         let aggregatePipeline = [
+//             {
+//                 '$lookup': {
+//                     'from': 'questions',
+//                     'localField': '_id',
+//                     'foreignField': 'user',
+//                     'as': 'questions'
+//                 }
+//             }, {
+//                 '$sort': {
+//                     'name': 1
+//                 }
+//             }
+//         ]
+//         users = await User.aggregate(aggregatePipeline);
+//     } else {
+//         // users = await User.findById(req.session.userId).populate('address').exec((err, users) => {
+//         //     if (err) return res.status(400).send(err);
+//         // });
+//         users = await User.findById(req.session.userId);
+//     }
+//     res.json(users);
+// }));
+
+app.get('/api/users', wrapAsync(async function(req,res,next) {
+    User.findById(req.params.id)
+        .populate('address')
+        .exec((err, users) => {
+            if (err) return res.status(400).send(err);
+            res.status(200).json({success: true, users});
+    })
 }));
 
 app.get('/api/users/:id', wrapAsync(async function (req,res, next) {
@@ -132,8 +144,14 @@ app.get('/api/users/:id', wrapAsync(async function (req,res, next) {
     if (mongoose.isValidObjectId(id)) {
         const user = await User.findById(id);
         if (user) {
-            res.json(user);
-            return;
+            // res.json(user);
+            // return;
+            User.find()
+                .populate('address')
+                .exec((err, users) => {
+                    if (err) return res.status(400).send(err);
+                    res.status(200).json({success: true, users});
+                })
         } else {
             throw new Error('User Not Found');
         }
@@ -144,9 +162,9 @@ app.get('/api/users/:id', wrapAsync(async function (req,res, next) {
 
 app.put('/api/users/:id', wrapAsync(async function (req, res) {
     const id = req.params.id;
-    const {name, email, password, profile_url, street, state} = req.body;
+    const {name, email, password, profile_url, address} = req.body;
     console.log("PUT with id: " + id + ", body: " + JSON.stringify(req.body));
-    await User.findByIdAndUpdate(id, {name, email, password, profile_url, street, state},
+    await User.findByIdAndUpdate(id, {name, email, password, profile_url, address},
         {runValidators: true});
     res.sendStatus(204);
 }));

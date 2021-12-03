@@ -19,10 +19,7 @@ var UserSchema = new Schema(
             match: [/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/, 'Please fill a valid password']
         },
         profile_url: {type: String},
-        address: {
-            street: {type: String},
-            state: {type: String},
-        }
+        address: {type: Schema.Types.ObjectId, ref: 'Address'}
     }
 );
 
