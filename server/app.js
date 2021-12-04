@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const User = require('./models/user');
 const Question = require('./models/question');
 const Response = require('./models/response')
+const Address = require('./models/address');
 const session = require('express-session');
 const MongoStore = require('connect-mongo'); // MongoDB session store
 
@@ -100,58 +101,59 @@ app.post('/api/users/:id/file', upload.single('image'), wrapAsync(async function
 //User
 app.use('/api/users/:id', (req, res, next) => {
     console.log("Request involving a specific user")
-    next(); // Try commenting out this next() and accessing a specific author page
+    next();
 })
 
-// app.get('/api/users', wrapAsync(async function (req,res) {
-//     let users;
-//     if (req.query.questions && req.query.questions === 'yes') {
-//         let aggregatePipeline = [
-//             {
-//                 '$lookup': {
-//                     'from': 'questions',
-//                     'localField': '_id',
-//                     'foreignField': 'user',
-//                     'as': 'questions'
-//                 }
-//             }, {
-//                 '$sort': {
-//                     'name': 1
-//                 }
-//             }
-//         ]
-//         users = await User.aggregate(aggregatePipeline);
-//     } else {
-//         // users = await User.findById(req.session.userId).populate('address').exec((err, users) => {
-//         //     if (err) return res.status(400).send(err);
-//         // });
-//         users = await User.findById(req.session.userId);
-//     }
-//     res.json(users);
-// }));
-
-app.get('/api/users', wrapAsync(async function(req,res,next) {
-    User.findById(req.params.id)
-        .populate('address')
-        .exec((err, users) => {
-            if (err) return res.status(400).send(err);
-            res.status(200).json({success: true, users});
-    })
+app.get('/api/users', wrapAsync(async function (req,res) {
+    let users;
+    if (req.query.questions && req.query.questions === 'yes') {
+        let aggregatePipeline = [
+            {
+                '$lookup': {
+                    'from': 'questions',
+                    'localField': '_id',
+                    'foreignField': 'user',
+                    'as': 'questions'
+                }
+            }, {
+                '$sort': {
+                    'name': 1
+                }
+            }
+        ]
+        users = await User.aggregate(aggregatePipeline);
+    } else {
+        // users = await User.findById(req.session.userId).populate('address').exec((err, users) => {
+        //     if (err) return res.status(400).send(err);
+        // });
+        users = await User.findById(req.session.userId);
+        // users = await User.findById(req.session.userId).populate('address');
+    }
+    res.json(users);
 }));
+
+// app.get('/api/users', wrapAsync(async function(req,res,next) {
+//     User.findById(req.params.id)
+//         .populate('address')
+//         .exec((err, users) => {
+//             if (err) return res.status(400).send(err);
+//             res.status(200).json({success: true, users});
+//     })
+// }));
 
 app.get('/api/users/:id', wrapAsync(async function (req,res, next) {
     let id = req.params.id;
     if (mongoose.isValidObjectId(id)) {
         const user = await User.findById(id);
         if (user) {
-            // res.json(user);
-            // return;
-            User.find()
-                .populate('address')
-                .exec((err, users) => {
-                    if (err) return res.status(400).send(err);
-                    res.status(200).json({success: true, users});
-                })
+            res.json(user);
+            return;
+            // User.find()
+            //     .populate('address')
+            //     .exec((err, users) => {
+            //         if (err) return res.status(400).send(err);
+            //         res.status(200).json({success: true, users});
+            //     })
         } else {
             throw new Error('User Not Found');
         }
@@ -174,7 +176,7 @@ app.post('/api/users', wrapAsync(async function (req, res) {
     const newUser = new User({
         name: req.body.name,
         email: req.body.email,
-        password: req.body.password,
+        password: req.body.password
     })
     await newUser.save();
     res.json(newUser);
@@ -247,14 +249,14 @@ app.post('/api/questions', requireLogin, wrapAsync(async function (req, res) {
 
 //Responses
 app.use('/api/responses', (req, res, next) => {
-    console.log("Request involving a specific question")
+    console.log("Request involving a specific response")
     next();
 })
 
 app.get('/api/responses', requireLogin, wrapAsync(async function (req,res) {
     console.log("Accessed by user id: " + req.session.userId);
-    const questions = await Response.find({});
-    res.json(questions);
+    const responses = await Response.find({});
+    res.json(responses);
 }));
 
 app.get('/api/responses/:id', requireLogin, wrapAsync(async function (req,res, next) {
@@ -285,6 +287,46 @@ app.post('/api/responses', requireLogin, wrapAsync(async function (req, res) {
     // Calling save is needed to save it to the database given we aren't using a special method like the update above
     await newResponse.save();
     res.json(newResponse);
+}));
+
+//Address
+app.use('/api/addresses', (req, res, next) => {
+    console.log("Request involving a specific address")
+    next();
+})
+
+app.get('/api/addresses', requireLogin, wrapAsync(async function (req,res) {
+    console.log("Accessed by user id: " + req.session.userId);
+    const addresses = await Response.find({});
+    res.json(addresses);
+}));
+
+app.get('/api/addresses/:id', requireLogin, wrapAsync(async function (req,res, next) {
+    let id = req.params.id;
+    if (mongoose.isValidObjectId(id)) {
+        const address = await Address.findById(id);
+        if (address) {
+            res.json(address);
+            return;
+        } else {
+            // The thrown error will be handled by the error handling middleware
+            throw new Error('Response Not Found');
+        }
+    } else {
+        throw new Error('Invalid Response Id');
+    }
+}));
+
+// The React app does not call the below methods, but these are further examples of using Express
+app.post('/api/addresses', requireLogin, wrapAsync(async function (req, res) {
+    console.log("Posted with body: " + JSON.stringify(req.body));
+    const newAddress = new Address({
+        street: req.body.street,
+        state: req.body.state,
+    })
+    // Calling save is needed to save it to the database given we aren't using a special method like the update above
+    await newAddress.save();
+    res.json(newAddress);
 }));
 
 app.use((err, req, res, next) => {
