@@ -12,10 +12,4 @@ var QuestionSchema = new Schema(
     }
 );
 
-QuestionSchema
-    .virtual('url')
-    .get(function () {
-        return '/catalog/question/' + this._id;
-    });
-
 module.exports = mongoose.model('Question', QuestionSchema);

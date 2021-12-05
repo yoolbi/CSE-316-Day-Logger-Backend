@@ -9,10 +9,4 @@ var ResponseSchema = new Schema(
     }
 );
 
-ResponseSchema
-    .virtual('url')
-    .get(function () {
-        return '/catalog/response/' + this._id;
-    });
-
 module.exports = mongoose.model('Response', ResponseSchema);

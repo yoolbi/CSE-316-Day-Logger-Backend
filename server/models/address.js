@@ -9,10 +9,4 @@ var AddressSchema = new Schema(
     }
 );
 
-AddressSchema
-    .virtual('url')
-    .get(function () {
-        return '/catalog/address/' + this._id;
-    });
-
 module.exports = mongoose.model('Address', AddressSchema);

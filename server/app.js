@@ -105,55 +105,41 @@ app.use('/api/users/:id', (req, res, next) => {
 })
 
 app.get('/api/users', wrapAsync(async function (req,res) {
-    let users;
-    if (req.query.questions && req.query.questions === 'yes') {
-        let aggregatePipeline = [
-            {
-                '$lookup': {
-                    'from': 'questions',
-                    'localField': '_id',
-                    'foreignField': 'user',
-                    'as': 'questions'
-                }
-            }, {
-                '$sort': {
-                    'name': 1
-                }
-            }
-        ]
-        users = await User.aggregate(aggregatePipeline);
-    } else {
-        // users = await User.findById(req.session.userId).populate('address').exec((err, users) => {
-        //     if (err) return res.status(400).send(err);
-        // });
-        users = await User.findById(req.session.userId);
-        // users = await User.findById(req.session.userId).populate('address');
-    }
+    // let users;
+    // if (req.query.questions && req.query.questions === 'yes') {
+    //     let aggregatePipeline = [
+    //         {
+    //             '$lookup': {
+    //                 'from': 'questions',
+    //                 'localField': '_id',
+    //                 'foreignField': 'user',
+    //                 'as': 'questions'
+    //             }
+    //         }, {
+    //             '$sort': {
+    //                 'name': 1
+    //             }
+    //         }
+    //     ]
+    //     users = await User.aggregate(aggregatePipeline);
+    // } else {
+    //     // users = await User.findById(req.session.userId);
+    //     users = await User.find().populate('address');
+    // }
+    const users = await User.findById(req.session.userId).populate('address').lean();
+    console.log(users);
     res.json(users);
 }));
-
-// app.get('/api/users', wrapAsync(async function(req,res,next) {
-//     User.findById(req.params.id)
-//         .populate('address')
-//         .exec((err, users) => {
-//             if (err) return res.status(400).send(err);
-//             res.status(200).json({success: true, users});
-//     })
-// }));
 
 app.get('/api/users/:id', wrapAsync(async function (req,res, next) {
     let id = req.params.id;
     if (mongoose.isValidObjectId(id)) {
-        const user = await User.findById(id);
+        // const user = await User.findById(id);
+        const user = await User.findById(id).populate('address').lean();
+        console.log(user);
         if (user) {
             res.json(user);
             return;
-            // User.find()
-            //     .populate('address')
-            //     .exec((err, users) => {
-            //         if (err) return res.status(400).send(err);
-            //         res.status(200).json({success: true, users});
-            //     })
         } else {
             throw new Error('User Not Found');
         }
@@ -183,8 +169,12 @@ app.post('/api/users', wrapAsync(async function (req, res) {
 }));
 
 app.get('/api/currentUser', wrapAsync(async function (req, res) {
-    const user = await User.findById(req.session.userId);
-    res.json(user);
+    // User.findById(req.session.userId).then(user =>{
+    //     Address.findById(user.address).then(address => {console.log(address);res.json({...user._doc, street: address.street, state: address.state})});
+    // });
+    User.findById(req.session.userId).populate("address").then(user => res.json({...user._doc, street: user.address.street, state: user.address.state}));
+
+    // res.json(user);
 }));
 
 //Questions
@@ -278,15 +268,22 @@ app.get('/api/responses/:id', requireLogin, wrapAsync(async function (req,res, n
 // The React app does not call the below methods, but these are further examples of using Express
 app.post('/api/responses', requireLogin, wrapAsync(async function (req, res) {
     console.log("Posted with body: " + JSON.stringify(req.body));
-    // const questionInstance = await Response.find().populate('question');
     const newResponse = new Response({
         responseText: req.body.responseText,
-        // responseQuestion: questionInstance,
         date: req.body.date,
     })
     // Calling save is needed to save it to the database given we aren't using a special method like the update above
     await newResponse.save();
     res.json(newResponse);
+}));
+
+app.put('/api/responses/:id', requireLogin, wrapAsync(async function (req, res) {
+    const id = req.params.id;
+    console.log("PUT with id: " + id + ", body: " + JSON.stringify(req.body));
+    await Response.findByIdAndUpdate(id,
+        {'responseText': req.body.responseText, 'date': req.body.date},
+        {runValidators: true});
+    res.sendStatus(204);
 }));
 
 //Address
@@ -327,6 +324,15 @@ app.post('/api/addresses', requireLogin, wrapAsync(async function (req, res) {
     // Calling save is needed to save it to the database given we aren't using a special method like the update above
     await newAddress.save();
     res.json(newAddress);
+}));
+
+app.put('/api/addresses/:id', requireLogin, wrapAsync(async function (req, res) {
+    const id = req.params.id;
+    console.log("PUT with id: " + id + ", body: " + JSON.stringify(req.body));
+    await Address.findByIdAndUpdate(id,
+        {'street': req.body.street, 'state': req.body.state},
+        {runValidators: true});
+    res.sendStatus(204);
 }));
 
 app.use((err, req, res, next) => {

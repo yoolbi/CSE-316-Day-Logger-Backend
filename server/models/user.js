@@ -23,13 +23,6 @@ var UserSchema = new Schema(
     }
 );
 
-// Virtual for user's URL
-UserSchema
-    .virtual('url')
-    .get(function () {
-        return '/catalog/user/' + this._id;
-    });
-
 UserSchema.statics.findAndValidate = async function (email, password) {
     const user = await this.findOne({email});
     if(!user) {
