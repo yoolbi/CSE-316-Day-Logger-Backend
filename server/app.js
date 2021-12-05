@@ -68,8 +68,8 @@ app.use((req, res, next) => {
 });
 
 app.post('/api/register', wrapAsync(async function (req, res) {
-    const {password, email, name} = req.body;
-    const user = new User({email, password, name})
+    const {password, email, name, address, profile_url} = req.body;
+    const user = new User({email, password, name, address, profile_url})
     await user.save();
     req.session.userId = user._id;
     res.json(user);
@@ -172,9 +172,20 @@ app.get('/api/currentUser', wrapAsync(async function (req, res) {
     // User.findById(req.session.userId).then(user =>{
     //     Address.findById(user.address).then(address => {console.log(address);res.json({...user._doc, street: address.street, state: address.state})});
     // });
-    User.findById(req.session.userId).populate("address").then(user => res.json({...user._doc, street: user.address.street, state: user.address.state}));
-
+    // User.findById(req.session.userId).populate("address").then(user => res.json({...user._doc, street: user.address.street, state: user.address.state}));
+    // res.json(User.findById(req.session.userId).populate("address"));
     // res.json(user);
+
+    // User.findById(req.session.userId).populate("address").then(user =>
+    //     res.json({...user,
+    //         name: user.name,
+    //         email: user.email,
+    //         profile_url: user.profile_url,
+    //         street: user.address.street,
+    //         state: user.address.state}));
+
+    const user = await User.findById(req.session.userId);
+    res.json(user);
 }));
 
 //Questions
@@ -294,7 +305,7 @@ app.use('/api/addresses', (req, res, next) => {
 
 app.get('/api/addresses', requireLogin, wrapAsync(async function (req,res) {
     console.log("Accessed by user id: " + req.session.userId);
-    const addresses = await Response.find({});
+    const addresses = await Address.find({});
     res.json(addresses);
 }));
 
@@ -333,6 +344,13 @@ app.put('/api/addresses/:id', requireLogin, wrapAsync(async function (req, res) 
         {'street': req.body.street, 'state': req.body.state},
         {runValidators: true});
     res.sendStatus(204);
+}));
+
+app.delete('/api/addresses/:id', requireLogin, wrapAsync(async function (req, res) {
+    const id = req.params.id;
+    const result = await Address.findByIdAndDelete(id);
+    console.log("Deleted successfully: " + result);
+    res.json(result);
 }));
 
 app.use((err, req, res, next) => {
