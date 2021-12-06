@@ -240,8 +240,11 @@ app.post('/api/questions', requireLogin, wrapAsync(async function (req, res) {
         questionText: req.body.questionText,
         responseType: req.body.responseType,
         questionOwner: req.session.userId,
-        multiText: req.session.multiText,
-        response: req.session.response
+        // multiText: req.body.multiText,
+        multiText1: req.body.multiText1,
+        multiText2: req.body.multiText2,
+        multiText3: req.body.multiText3,
+        response: req.body.response
     })
     // Calling save is needed to save it to the database given we aren't using a special method like the update above
     await newQuestion.save();
