@@ -4,8 +4,8 @@ var Schema = mongoose.Schema;
 
 var QuestionSchema = new Schema(
     {
-        questionText: {type: String, required: true},
-        responseType: {type: String, required: true},
+        questionText: {type: String},
+        responseType: {type: String},
         multiText: [{type: String}],
         response: [{type:Schema.Types.ObjectId, ref: 'Response'}],
         questionOwner: {type: Schema.Types.ObjectId, ref: 'User', required: true}
