@@ -13,7 +13,18 @@ const upload = multer({dest: 'uploads/'})
 const app = express();
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
+const ORIGIN =
+    process.env.NODE_ENV === "production"
+        ? "https://316daylogger.netlify.app"
+        : "http://localhost:3000";
 
+app.use(
+    cors({
+        origin: ORIGIN,
+        methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+        credentials: true,
+    })
+);
 const sessionSecret = 'make a secret string';
 
 //Set up mongoose connection
@@ -39,7 +50,9 @@ const sessionConfig = {
     cookie: {
         httpOnly: true,
         expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
-        maxAge: 1000 * 60 * 60 * 24 * 7
+        maxAge: 1000 * 60 * 60 * 24 * 7,
+        secure: true,
+        sameSite: "none",
         // later you would want to add: 'secure: true' once your website is hosted on HTTPS.
     }
 }
