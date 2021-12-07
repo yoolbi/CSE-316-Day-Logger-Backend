@@ -25,6 +25,7 @@ app.use(
         credentials: true,
     })
 );
+
 const sessionSecret = 'make a secret string';
 
 //Set up mongoose connection
