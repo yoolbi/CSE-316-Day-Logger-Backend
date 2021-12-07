@@ -6,7 +6,7 @@ const Response = require('./models/response')
 const Address = require('./models/address');
 const session = require('express-session');
 const MongoStore = require('connect-mongo'); // MongoDB session store
-
+const cors = require('cors');
 const multer = require('multer');
 const upload = multer({dest: 'uploads/'})
 
