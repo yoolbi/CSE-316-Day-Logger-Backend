@@ -26,6 +26,16 @@ app.use(
     })
 );
 
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", ORIGIN);
+    res.header("Access-Control-Allow-Credentials", true);
+    res.header(
+        "Access-Control-Allow-Headers",
+        "Origin, X-Requested-With, Content-Type, Accept"
+    );
+    next();
+});
+
 const sessionSecret = 'make a secret string';
 
 //Set up mongoose connection
@@ -52,8 +62,10 @@ const sessionConfig = {
         httpOnly: true,
         expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
         maxAge: 1000 * 60 * 60 * 24 * 7,
-        secure: true,
+        secure: process.env.NODE_ENV === "production",
         sameSite: "none",
+        credential: true,
+        path: "/"
         // later you would want to add: 'secure: true' once your website is hosted on HTTPS.
     }
 }
