@@ -283,13 +283,13 @@ app.use('/api/responses', (req, res, next) => {
     next();
 })
 
-app.get('/api/responses', requireLogin, wrapAsync(async function (req,res) {
+app.get('/api/responses', wrapAsync(async function (req,res) {
     console.log("Accessed by user id: " + req.session.userId);
     const responses = await Response.find({});
     res.json(responses);
 }));
 
-app.get('/api/responses/:id', requireLogin, wrapAsync(async function (req,res, next) {
+app.get('/api/responses/:id', wrapAsync(async function (req,res, next) {
     let id = req.params.id;
     if (mongoose.isValidObjectId(id)) {
         const response = await Response.findById(id);
@@ -306,7 +306,7 @@ app.get('/api/responses/:id', requireLogin, wrapAsync(async function (req,res, n
 }));
 
 // The React app does not call the below methods, but these are further examples of using Express
-app.post('/api/responses', requireLogin, wrapAsync(async function (req, res) {
+app.post('/api/responses', wrapAsync(async function (req, res) {
     console.log("Posted with body: " + JSON.stringify(req.body));
     const newResponse = new Response({
         responseText: req.body.responseText,
@@ -317,7 +317,7 @@ app.post('/api/responses', requireLogin, wrapAsync(async function (req, res) {
     res.json(newResponse);
 }));
 
-app.put('/api/responses/:id', requireLogin, wrapAsync(async function (req, res) {
+app.put('/api/responses/:id', wrapAsync(async function (req, res) {
     const id = req.params.id;
     console.log("PUT with id: " + id + ", body: " + JSON.stringify(req.body));
     await Response.findByIdAndUpdate(id,
@@ -332,13 +332,13 @@ app.use('/api/addresses', (req, res, next) => {
     next();
 })
 
-app.get('/api/addresses', requireLogin, wrapAsync(async function (req,res) {
+app.get('/api/addresses', wrapAsync(async function (req,res) {
     console.log("Accessed by user id: " + req.session.userId);
     const addresses = await Address.find({});
     res.json(addresses);
 }));
 
-app.get('/api/addresses/:id', requireLogin, wrapAsync(async function (req,res, next) {
+app.get('/api/addresses/:id', wrapAsync(async function (req,res, next) {
     let id = req.params.id;
     if (mongoose.isValidObjectId(id)) {
         const address = await Address.findById(id);
@@ -355,7 +355,7 @@ app.get('/api/addresses/:id', requireLogin, wrapAsync(async function (req,res, n
 }));
 
 // The React app does not call the below methods, but these are further examples of using Express
-app.post('/api/addresses', requireLogin, wrapAsync(async function (req, res) {
+app.post('/api/addresses', wrapAsync(async function (req, res) {
     console.log("Posted with body: " + JSON.stringify(req.body));
     const newAddress = new Address({
         street: req.body.street,
@@ -366,7 +366,7 @@ app.post('/api/addresses', requireLogin, wrapAsync(async function (req, res) {
     res.json(newAddress);
 }));
 
-app.put('/api/addresses/:id', requireLogin, wrapAsync(async function (req, res) {
+app.put('/api/addresses/:id', wrapAsync(async function (req, res) {
     const id = req.params.id;
     console.log("PUT with id: " + id + ", body: " + JSON.stringify(req.body));
     await Address.findByIdAndUpdate(id,
@@ -375,7 +375,7 @@ app.put('/api/addresses/:id', requireLogin, wrapAsync(async function (req, res) 
     res.sendStatus(204);
 }));
 
-app.delete('/api/addresses/:id', requireLogin, wrapAsync(async function (req, res) {
+app.delete('/api/addresses/:id', wrapAsync(async function (req, res) {
     const id = req.params.id;
     const result = await Address.findByIdAndDelete(id);
     console.log("Deleted successfully: " + result);
