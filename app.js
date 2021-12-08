@@ -13,28 +13,28 @@ const upload = multer({dest: 'uploads/'})
 const app = express();
 const bodyParser = require('body-parser');
 app.use(bodyParser.json());
-const ORIGIN =
-    process.env.NODE_ENV === "production"
-        ? "https://316daylogger.netlify.app"
-        : "http://localhost:3000";
-
-app.use(
-    cors({
-        origin: ORIGIN,
-        methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
-        credentials: true,
-    })
-);
-
-app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", ORIGIN);
-    res.header("Access-Control-Allow-Credentials", true);
-    res.header(
-        "Access-Control-Allow-Headers",
-        "Origin, X-Requested-With, Content-Type, Accept"
-    );
-    next();
-});
+// const ORIGIN =
+//     process.env.NODE_ENV === "production"
+//         ? "https://316daylogger.netlify.app"
+//         : "http://localhost:3000";
+//
+// app.use(
+//     cors({
+//         origin: ORIGIN,
+//         methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+//         credentials: true,
+//     })
+// );
+//
+// app.use(function(req, res, next) {
+//     res.header("Access-Control-Allow-Origin", ORIGIN);
+//     res.header("Access-Control-Allow-Credentials", true);
+//     res.header(
+//         "Access-Control-Allow-Headers",
+//         "Origin, X-Requested-With, Content-Type, Accept"
+//     );
+//     next();
+// });
 
 const sessionSecret = 'make a secret string';
 
