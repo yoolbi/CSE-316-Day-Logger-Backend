@@ -6,7 +6,7 @@ const Response = require('./models/response')
 const Address = require('./models/address');
 const session = require('express-session');
 const MongoStore = require('connect-mongo'); // MongoDB session store
-const cors = require('cors');
+// const cors = require('cors');
 const multer = require('multer');
 const upload = multer({dest: 'uploads/'})
 
@@ -62,10 +62,10 @@ const sessionConfig = {
         httpOnly: true,
         expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
         maxAge: 1000 * 60 * 60 * 24 * 7,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "none",
-        credential: true,
-        path: "/"
+        // secure: process.env.NODE_ENV === "production",
+        // sameSite: "none",
+        // credential: true,
+        // path: "/"
         // later you would want to add: 'secure: true' once your website is hosted on HTTPS.
     }
 }
