@@ -311,6 +311,7 @@ app.post('/api/responses', wrapAsync(async function (req, res) {
     const newResponse = new Response({
         responseText: req.body.responseText,
         date: req.body.date,
+        parentQuestion: req.body.parentQuestion
     })
     // Calling save is needed to save it to the database given we aren't using a special method like the update above
     await newResponse.save();

@@ -6,6 +6,7 @@ var ResponseSchema = new Schema(
     {
         responseText: {type: String, Number},
         date: {type: String},
+        parentQuestion: {type: Schema.Types.ObjectId, ref: 'Question'}
     }
 );
 
