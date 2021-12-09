@@ -30,7 +30,7 @@ mongodb+srv://yoolbi:yoolbi716@cluster0.mcvce.mongodb.net/local_library?retryWri
 
 ## Testing
 1. cd CSE-316-Day-Logger-Backend
-2. jest test
+2. npm test
 
 
 ## Structure
